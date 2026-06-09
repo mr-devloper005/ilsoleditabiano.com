@@ -110,7 +110,11 @@ export function TaskDetailView({ task, post, related, comments = [] }: { task: T
 
 function BackLink({ task }: { task: TaskKey }) {
   const taskConfig = getTaskConfig(task)
-
+  return (
+    <Link href={taskConfig?.route || '/'} className="inline-flex items-center gap-2 border border-white/22 px-5 py-3 text-sm font-black uppercase tracking-[0.05em] text-white transition hover:bg-white hover:text-black">
+      <ArrowLeft className="h-4 w-4" /> Back to {taskConfig?.label || 'posts'}
+    </Link>
+  )
 }
 
 function DetailHero({ task, post, label }: { task: TaskKey; post: SitePost; label: string }) {
