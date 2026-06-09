@@ -3,45 +3,45 @@ import { slot4BrandConfig } from '@/editable/theme/brand.config'
 export const globalContent = {
   site: {
     name: slot4BrandConfig.siteName,
-    tagline: slot4BrandConfig.tagline || 'Independent reading platform',
+    tagline: slot4BrandConfig.tagline || 'Visual portfolios and professional profiles',
     domain: slot4BrandConfig.domain,
     baseUrl: slot4BrandConfig.baseUrl,
   },
   nav: {
-    tagline: 'Independent reading platform',
+    tagline: 'Visual portfolios and professional profiles',
     primaryLinks: [
-      { label: 'Articles', href: '/articles' },
-      { label: 'Visuals', href: '/image-sharing' },
-      { label: 'Listings', href: '/listings' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Our Story', href: '/about' },
+      { label: 'Profiles', href: '/profile' },
+      { label: 'Visuals', href: '/image' },
+      { label: 'Resources', href: '/article' },
     ],
     actions: {
-      primary: { label: 'Start exploring', href: '/' },
-      secondary: { label: 'Submit', href: '/contact' },
+      primary: { label: 'Find a profile', href: '/profile' },
+      secondary: { label: 'Share work', href: '/create' },
     },
   },
   footer: {
-    tagline: 'Stories, resources, and discoverable posts',
-    description: 'A connected publishing surface for articles, visuals, listings, profiles, bookmarks, and downloadable resources.',
+    tagline: 'Visual discovery for creative work',
+    description: 'A high-contrast discovery surface for portfolios, image stories, creative profiles, and practical resources.',
     columns: [
       {
-        title: 'Explore',
+        title: 'Discover',
         links: [
-          { label: 'Articles', href: '/articles' },
-          { label: 'Listings', href: '/listings' },
-          { label: 'Images', href: '/image-sharing' },
+          { label: 'Profiles', href: '/profile' },
+          { label: 'Images', href: '/image' },
+          { label: 'Articles', href: '/article' },
           { label: 'PDF Library', href: '/pdf' },
         ],
       },
       {
         title: 'Site',
         links: [
-          { label: 'About', href: '/about' },
+          { label: 'Our Story', href: '/about' },
           { label: 'Contact', href: '/contact' },
         ],
       },
     ],
-    bottomNote: 'Built for clean discovery and connected publishing.',
+    bottomNote: 'Built for clean visual discovery.',
   },
   commonLabels: {
     readMore: 'Read more',
