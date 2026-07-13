@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Clock3 } from 'lucide-react'
 import type { SitePost } from '@/lib/site-connector'
 import type { TaskKey } from '@/lib/site-config'
+import { stripHtmlToText } from '@/editable/shell/html-utils'
 
 export function getEditablePostImage(post?: SitePost | null) {
   const media = Array.isArray(post?.media) ? post?.media : []
@@ -21,7 +22,7 @@ export function getEditableExcerpt(post?: SitePost | null, limit = 150) {
     (typeof content.excerpt === 'string' && content.excerpt) ||
     post?.summary ||
     ''
-  const clean = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  const clean = stripHtmlToText(raw)
   return clean.length > limit ? `${clean.slice(0, limit).trim()}...` : clean
 }
 
