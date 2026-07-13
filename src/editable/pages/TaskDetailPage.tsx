@@ -6,6 +6,7 @@ import { buildPostUrl, fetchArticleComments, fetchTaskPostBySlug, fetchTaskPosts
 import { getTaskConfig, SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import type { SitePost } from '@/lib/site-connector'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
+import { decodeHtmlEntities, hasHtmlTags, stripHtmlToText, escapeHtml as escapeHtmlShared } from '@/editable/shell/html-utils'
 
 export const revalidate = 3
 
@@ -52,12 +53,7 @@ const getBody = (post: SitePost) => {
   return asText(content.body) || asText(content.description) || asText(content.details) || post.summary || 'Details will appear here once available.'
 }
 
-const escapeHtml = (value: string) => value
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;')
+const escapeHtml = escapeHtmlShared
 
 const safeUrl = (value: string) => /^https?:\/\//i.test(value) ? value : '#'
 const linkifyMarkdown = (value: string) => value.replace(/\[([^\]]+)]\((https?:\/\/[^\s)]+)\)/gi, (_match, label, url) => `<a href="${safeUrl(url)}" target="_blank" rel="nofollow noopener noreferrer">${label}</a>`)
@@ -68,6 +64,10 @@ const hardenLinks = (html: string) => html.replace(/<a\s+([^>]*href=["'][^"']+["
   if (!/\srel=/i.test(next)) next += ' rel="nofollow noopener noreferrer"'
   return `<a ${next}>`
 })
+const unescapeDoubleEncoded = (value: string) => {
+  const looksDoubleEncoded = /&lt;\/?[a-z][\w\-]*[^&]*?&gt;/i.test(value) || /&amp;(?:amp|lt|gt|quot|apos|nbsp|#\d+|#x[0-9a-f]+);/i.test(value)
+  return looksDoubleEncoded ? decodeHtmlEntities(value) : value
+}
 const sanitizeHtml = (html: string) => hardenLinks(html
   .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
   .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
@@ -75,13 +75,18 @@ const sanitizeHtml = (html: string) => hardenLinks(html
   .replace(/\s+on\w+=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
   .replace(/(href|src)=(['"])javascript:[\s\S]*?\2/gi, '$1="#"'))
 const formatPlainText = (raw: string) => {
-  const value = raw.trim()
-  if (!value) return ''
-  if (/<[a-z][\s\S]*>/i.test(value)) return sanitizeHtml(linkifyMarkdown(value))
-  return value.split(/\n{2,}/).map((part) => `<p>${linkifyText(escapeHtml(part).replace(/\n/g, '<br />'))}</p>`).join('')
+  const trimmed = raw.trim()
+  if (!trimmed) return ''
+  const value = unescapeDoubleEncoded(trimmed)
+  if (hasHtmlTags(value)) return sanitizeHtml(linkifyMarkdown(value))
+  const decoded = decodeHtmlEntities(value)
+  return decoded.split(/\n{2,}/).map((part) => `<p>${linkifyText(escapeHtml(part).replace(/\n/g, '<br />'))}</p>`).join('')
 }
 
-const summaryText = (post: SitePost) => post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || ''
+const summaryText = (post: SitePost) => {
+  const raw = post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || ''
+  return stripHtmlToText(raw)
+}
 const categoryOf = (post: SitePost, fallback: string) => asText(getContent(post).category) || post.tags?.[0] || fallback
 const mapSrcFor = (post: SitePost) => {
   const address = getField(post, ['address', 'location', 'city'])
