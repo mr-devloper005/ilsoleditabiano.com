@@ -125,7 +125,7 @@ function BackLink({ task }: { task: TaskKey }) {
   )
 }
 
-function DetailHero({ task, post, label }: { task: TaskKey; post: SitePost; label: string }) {
+function DetailHero({ task, post, label, hideSummary = false }: { task: TaskKey; post: SitePost; label: string; hideSummary?: boolean }) {
   const images = getImages(post)
   return (
     <section className="relative overflow-hidden">
@@ -135,7 +135,7 @@ function DetailHero({ task, post, label }: { task: TaskKey; post: SitePost; labe
         <BackLink task={task} />
         <p className="mt-10 text-xs font-black uppercase tracking-[0.18em] text-[var(--slot4-accent)]">{label}</p>
         <h1 className="mt-5 max-w-6xl text-5xl font-black uppercase leading-[0.86] tracking-[-0.03em] sm:text-7xl">{post.title}</h1>
-        <p className="mt-7 max-w-3xl text-lg font-semibold leading-8 text-white/72">{summaryText(post) || 'Explore the details, visuals, and related resources for this post.'}</p>
+        {hideSummary ? null : <p className="mt-7 max-w-3xl text-lg font-semibold leading-8 text-white/72">{summaryText(post) || 'Explore the details, visuals, and related resources for this post.'}</p>}
       </div>
     </section>
   )
@@ -206,13 +206,15 @@ function ClassifiedDetail({ post, related }: { post: SitePost; related: SitePost
 
 function ImageDetail({ post, related }: { post: SitePost; related: SitePost[] }) {
   const images = getImages(post)
+  const imageContent = getContent(post)
+  const hasDistinctBody = Boolean(asText(imageContent.body) || asText(imageContent.description) || asText(imageContent.details))
   return (
     <>
-      <DetailHero task="image" post={post} label="Image story" />
+      <DetailHero task="image" post={post} label="Image story" hideSummary />
       <section className="mx-auto grid max-w-[var(--editable-container)] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[380px_minmax(0,1fr)] lg:px-24">
         <aside className="border border-white/14 bg-[#101010] p-7 lg:sticky lg:top-32 lg:self-start">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-black"><Camera className="h-4 w-4" /> Visual image</div>
-          <BodyContent post={post} compact />
+          {hasDistinctBody ? <BodyContent post={post} compact /> : null}
           <RelatedPanel task="image" post={post} related={related} compact />
         </aside>
         <div className="columns-1 gap-8 space-y-8 md:columns-2">
